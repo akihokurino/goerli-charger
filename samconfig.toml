@@ -1,0 +1,9 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+capabilities = "CAPABILITY_IAM"
+confirm_changeset = false
+region = "ap-northeast-1"
+s3_bucket = "goerli-charger-artifact"
+stack_name = "goerli-charger"

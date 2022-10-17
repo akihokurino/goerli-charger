@@ -1,0 +1,37 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Globals:
+  Function:
+    Timeout: 900
+
+Parameters:
+  SsmParameter:
+    Type: String
+    Default: /goerli-charger/server/dotenv
+    Description: ssm parameter path
+
+Resources:
+  BatchFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      PackageType: Image
+      MemorySize: 512
+      Timeout: 900
+      Events:
+        Charge:
+          Type: Schedule
+          Properties:
+            Description: ""
+            Enabled: true
+            Input: "{}"
+            Schedule: "cron(0 0 * * ? *)"
+      Environment:
+        Variables:
+          SSM_PARAMETER: !Ref SsmParameter
+      Policies:
+        - AmazonSSMReadOnlyAccess
+        - AmazonS3FullAccess
+    Metadata:
+      DockerTag: latest
+      DockerContext: ./
+      Dockerfile: Dockerfile
