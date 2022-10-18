@@ -10,8 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "aws-sdk": "^2.1233.0",
-    "puppeteer": "^19.0.0",
-    "puppeteer-core": "^19.0.0"
+    "puppeteer": "^18.2.1"
   },
   "devDependencies": {
     "@types/aws-sdk": "^2.7.0",

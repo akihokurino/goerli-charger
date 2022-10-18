@@ -5,6 +5,15 @@ export const run = async () => {
 
   const browser = await puppeteer.launch({
     headless: process.env.LOCAL === undefined,
+    args: [
+      "--no-sandbox",
+      "--disable-setuid-sandbox",
+      "-–disable-dev-shm-usage",
+      "--disable-gpu",
+      "--no-first-run",
+      "--no-zygote",
+      "--single-process",
+    ],
   });
 
   {
