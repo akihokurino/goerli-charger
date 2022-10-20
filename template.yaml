@@ -26,7 +26,7 @@ Resources:
             Description: ""
             Enabled: true
             Input: "{}"
-            Schedule: "rate(12 hours)"
+            Schedule: "rate(25 hours)"
       Environment:
         Variables:
           SSM_PARAMETER: !Ref SsmParameter
