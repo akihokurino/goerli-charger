@@ -1,4 +1,8 @@
+import S3 from "aws-sdk/clients/s3";
+import fs from "fs";
 import * as puppeteer from "puppeteer";
+
+const s3Cli = new S3();
 
 export const run = async () => {
   console.log("---------- Faucet補充開始 ----------");
@@ -25,7 +29,7 @@ export const run = async () => {
     await page.type(process.env.SELECTOR_PASSWORD!, process.env.PASSWORD!);
     await page.click(process.env.SELECTOR_LOGIN_BUTTON!);
     await page.waitForSelector(process.env.SELECTOR_FAUCET_BUTTON!, {
-      timeout: 30000,
+      timeout: 10000,
     });
   }
 
@@ -36,10 +40,33 @@ export const run = async () => {
     await page.waitForTimeout(500);
     await page.type(process.env.SELECTOR_ADDRESS!, process.env.ADDRESS!);
     await page.click(process.env.SELECTOR_FAUCET_BUTTON!);
-    await page.waitForTimeout(5000);
+    try {
+      await page.waitForSelector(process.env.SELECTOR_ALERT!, {
+        timeout: 5000,
+      });
+      await page.waitForTimeout(5000);
+      console.log(
+        "---------- Faucetエラー（24時間に1度しか補充できません） ----------"
+      );
+    } catch (error) {
+      console.log("---------- Faucet補充完了 ----------");
+    }
+    await page.screenshot({ path: "/tmp/result.jpg" });
   }
 
-  await browser.close();
+  const now = new Date();
+  now.setTime(now.getTime() + 1000 * 60 * 60 * 9);
+  const fileStream = fs.createReadStream("/tmp/result.jpg");
+  await s3Cli
+    .putObject({
+      Bucket: "goerli-charger-userdata",
+      Key: `log/${now.toISOString()}.jpg`,
+      Body: fileStream,
+      ContentType: "image/jpeg",
+    })
+    .promise();
 
-  console.log("---------- Faucet補充完了 ----------");
+  console.log("---------- ログアップロード完了 ----------");
+
+  await browser.close();
 };
